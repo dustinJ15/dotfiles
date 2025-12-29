@@ -1,0 +1,109 @@
+#!/bin/bash
+# dwm status bar script - Gruvbox themed with Nerd Font icons
+
+IFACE="wlp2s0"
+RX_OLD=0
+TX_OLD=0
+
+get_cpu() {
+    usage=$(top -bn1 | grep "Cpu(s)" | awk '{printf "%2d", $2}')
+    temp=$(sensors 2>/dev/null | awk '/^Core 0:/ {gsub(/\+|°C/,""); print int($3)}')
+    echo "󰻠 ${usage}% ${temp}°"
+}
+
+get_volume() {
+    vol=$(pactl get-sink-volume @DEFAULT_SINK@ 2>/dev/null | grep -oP '\d+%' | head -1 | tr -d '%')
+    muted=$(pactl get-sink-mute @DEFAULT_SINK@ 2>/dev/null | grep -oP 'yes|no')
+
+    if [[ "$muted" == "yes" ]]; then
+        echo "󰖁 mute"
+    elif [[ "$vol" -ge 70 ]]; then
+        echo "󰕾 ${vol}%"
+    elif [[ "$vol" -ge 30 ]]; then
+        echo "󰖀 ${vol}%"
+    else
+        echo "󰕿 ${vol}%"
+    fi
+}
+
+get_battery() {
+    if [[ -f /sys/class/power_supply/BAT0/charge_now ]]; then
+        now=$(cat /sys/class/power_supply/BAT0/charge_now)
+        full=$(cat /sys/class/power_supply/BAT0/charge_full)
+        status=$(cat /sys/class/power_supply/BAT0/status)
+        cap=$(( now * 100 / full ))
+
+        if [[ "$status" == "Charging" ]]; then
+            echo "󰂄 ${cap}%"
+        elif [[ "$cap" -ge 90 ]]; then
+            echo "󰁹 ${cap}%"
+        elif [[ "$cap" -ge 70 ]]; then
+            echo "󰂁 ${cap}%"
+        elif [[ "$cap" -ge 50 ]]; then
+            echo "󰁿 ${cap}%"
+        elif [[ "$cap" -ge 30 ]]; then
+            echo "󰁽 ${cap}%"
+        elif [[ "$cap" -ge 10 ]]; then
+            echo "󰁻 ${cap}%"
+        else
+            echo "󰂃 ${cap}%"
+        fi
+    fi
+}
+
+get_memory() {
+    mem=$(free -h | awk '/^Mem:/ {gsub(/Gi/,"G"); print $3}')
+    echo "󰍛 $mem"
+}
+
+get_disk() {
+    disk=$(df -h / | awk 'NR==2 {print $3}')
+    echo "󰋊 $disk"
+}
+
+get_network() {
+    # Wifi name
+    wifi=$(iw dev $IFACE link 2>/dev/null | awk '/SSID:/ {print $2}')
+    [[ -z "$wifi" ]] && wifi="offline"
+
+    # Speed calculation
+    RX_NEW=$(cat /sys/class/net/$IFACE/statistics/rx_bytes 2>/dev/null || echo 0)
+    TX_NEW=$(cat /sys/class/net/$IFACE/statistics/tx_bytes 2>/dev/null || echo 0)
+
+    if [[ $RX_OLD -ne 0 ]]; then
+        RX_RATE=$(( (RX_NEW - RX_OLD) / 1024 ))
+        TX_RATE=$(( (TX_NEW - TX_OLD) / 1024 ))
+        echo "󰖩 $wifi 󰁅${RX_RATE}K 󰁝${TX_RATE}K"
+    else
+        echo "󰖩 $wifi"
+    fi
+
+    RX_OLD=$RX_NEW
+    TX_OLD=$TX_NEW
+}
+
+get_uptime() {
+    up=$(uptime -p | sed 's/up //' | sed 's/ hours\?/h/' | sed 's/ minutes\?/m/' | sed 's/, //')
+    echo "󰅐 $up"
+}
+
+get_music() {
+    player=$(playerctl status 2>/dev/null)
+    if [[ "$player" == "Playing" ]]; then
+        artist=$(playerctl metadata artist 2>/dev/null | cut -c1-15)
+        title=$(playerctl metadata title 2>/dev/null | cut -c1-20)
+        echo "󰎆 $artist - $title"
+    elif [[ "$player" == "Paused" ]]; then
+        echo "󰏤"
+    fi
+}
+
+get_datetime() {
+    echo "󰃭 $(date '+%a %b %d %I:%M %p')"
+}
+
+while true; do
+    status="  $(get_network)  $(get_cpu)  $(get_memory)  $(get_volume)  $(get_battery)  $(get_datetime)  "
+    xsetroot -name "$status"
+    sleep 1
+done
