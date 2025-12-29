@@ -12,6 +12,12 @@ xinput set-prop "pointer:2.4G Wireless Device" "Coordinate Transformation Matrix
 xinput set-prop "Apple SPI Touchpad" "libinput Accel Speed" 1.0 2>/dev/null
 xinput set-prop "Apple SPI Touchpad" "libinput Scrolling Pixel Distance" 50 2>/dev/null
 
+# Start compositor
+picom -b &
+
+# Start notification daemon
+dunst &
+
 # Start dwm status bar
 ~/.local/bin/dwm-status &
 
