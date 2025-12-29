@@ -2,8 +2,6 @@
 # dwm status bar script - Gruvbox themed with Nerd Font icons
 
 IFACE="wlp2s0"
-RX_OLD=0
-TX_OLD=0
 
 get_cpu() {
     usage=$(top -bn1 | grep "Cpu(s)" | awk '{printf "%2d", $2}')
@@ -62,24 +60,15 @@ get_disk() {
 }
 
 get_network() {
-    # Wifi name
-    wifi=$(iw dev $IFACE link 2>/dev/null | awk '/SSID:/ {print $2}')
-    [[ -z "$wifi" ]] && wifi="offline"
-
-    # Speed calculation
-    RX_NEW=$(cat /sys/class/net/$IFACE/statistics/rx_bytes 2>/dev/null || echo 0)
-    TX_NEW=$(cat /sys/class/net/$IFACE/statistics/tx_bytes 2>/dev/null || echo 0)
-
-    if [[ $RX_OLD -ne 0 ]]; then
-        RX_RATE=$(( (RX_NEW - RX_OLD) / 1024 ))
-        TX_RATE=$(( (TX_NEW - TX_OLD) / 1024 ))
-        echo "󰖩 $wifi 󰁅${RX_RATE}K 󰁝${TX_RATE}K"
+    signal_dbm=$(iw dev $IFACE link 2>/dev/null | awk '/signal:/ {print $2}')
+    if [[ -n "$signal_dbm" ]]; then
+        signal=$(( (signal_dbm + 90) * 100 / 60 ))
+        [[ $signal -gt 100 ]] && signal=100
+        [[ $signal -lt 0 ]] && signal=0
     else
-        echo "󰖩 $wifi"
+        signal="--"
     fi
-
-    RX_OLD=$RX_NEW
-    TX_OLD=$TX_NEW
+    echo "󰖩 ${signal}%"
 }
 
 get_uptime() {
