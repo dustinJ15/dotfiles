@@ -2,13 +2,19 @@
 
 My Arch Linux configuration files.
 
-## What's included
+## Structure
 
-- **dwm** - Dynamic window manager (suckless) with Gruvbox theme
-- **st** - Simple terminal (suckless)
-- **dmenu** - Application launcher (suckless)
-- **dwm-status** - Custom status bar script
-- Shell configs (`.bashrc`, `.bash_profile`)
+```
+├── suckless/
+│   ├── dwm/    # Dynamic window manager (Gruvbox theme)
+│   ├── st/     # Simple terminal
+│   └── dmenu/  # Application launcher
+├── scripts/
+│   ├── dwm-status    # Status bar script
+│   └── hhkb-connect  # HHKB keyboard setup
+├── .xinitrc          # X11 startup (HiDPI, mouse, touchpad)
+└── shell configs (.bashrc, .bash_profile)
+```
 
 ## Installation
 
@@ -18,14 +24,14 @@ git clone https://github.com/dustinJ15/dotfiles.git
 cd dotfiles
 
 # Install suckless tools
-cd dwm && sudo make clean install && cd ..
-cd st && sudo make clean install && cd ..
-cd dmenu && sudo make clean install && cd ..
+cd suckless/dwm && sudo make clean install && cd ../..
+cd suckless/st && sudo make clean install && cd ../..
+cd suckless/dmenu && sudo make clean install && cd ../..
 
 # Copy configs
-cp .bashrc .bash_profile .gitconfig .fehbg ~/
+cp .bashrc .bash_profile .gitconfig .fehbg .xinitrc ~/
 mkdir -p ~/.local/bin
-cp .local/bin/dwm-status ~/.local/bin/
+cp scripts/* ~/.local/bin/
 ```
 
 ## Dependencies

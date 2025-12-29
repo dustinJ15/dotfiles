@@ -1,0 +1,40 @@
+#!/bin/bash
+HHKB="C7:E3:5A:43:1F:25"
+
+# Silent mode for auto-start (pass --auto or -a)
+if [[ "$1" == "--auto" || "$1" == "-a" ]]; then
+    exec &>/dev/null
+
+    # Longer wait for system/BT adapter to stabilize (especially after hibernate)
+    sleep 5
+
+    bluetoothctl power on
+    sleep 2
+    bluetoothctl trust "$HHKB"
+
+    # Retry connection with more attempts and longer waits
+    for i in {1..15}; do
+        # Check if already connected
+        if bluetoothctl info "$HHKB" 2>/dev/null | grep -q "Connected: yes"; then
+            exit 0
+        fi
+
+        bluetoothctl connect "$HHKB" && exit 0
+
+        # Progressive backoff
+        if [ $i -lt 5 ]; then
+            sleep 2
+        elif [ $i -lt 10 ]; then
+            sleep 3
+        else
+            sleep 4
+        fi
+    done
+    exit 1
+fi
+
+# Interactive mode (manual keybind)
+bluetoothctl power on
+bluetoothctl trust "$HHKB"
+sleep 1
+bluetoothctl connect "$HHKB"
