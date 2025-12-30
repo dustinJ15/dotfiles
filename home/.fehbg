@@ -1,2 +1,2 @@
 #!/bin/sh
-feh --no-fehbg --bg-fill '/home/dustin/Images/gruvbox-space-jellyfish.png' 
+feh --no-fehbg --bg-fill '/home/dustin/Pictures/gruvbox-space-jellyfish.png' 
