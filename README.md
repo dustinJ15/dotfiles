@@ -1,6 +1,6 @@
 # dotfiles
 
-My Arch Linux configuration files.
+My Arch Linux configuration files. Just for fun.
 
 ## Structure
 
