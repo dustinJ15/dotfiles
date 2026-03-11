@@ -1,0 +1,16 @@
+[Unit]
+Description=rclone Google Drive mount
+After=network-online.target
+
+[Service]
+Type=notify
+ExecStart=rclone mount gdrive: /home/dustin/google-drive \
+  --vfs-cache-mode writes \
+  --vfs-cache-max-size 1G \
+  --dir-cache-time 1h \
+  --log-level INFO
+ExecStop=/bin/fusermount3 -u /home/dustin/google-drive
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

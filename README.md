@@ -1,58 +1,41 @@
 # dotfiles
 
-My Arch Linux configuration files. Just for fun.
+Personal dotfiles for Arch Linux and Fedora Workstation.
 
 ## Structure
 
 ```
 dotfiles/
-├── home/                   # Symlink contents to ~/
-│   ├── .bashrc
-│   ├── .bash_profile
-│   ├── .gitconfig
-│   ├── .fehbg
-│   ├── .xinitrc
-│   └── .local/bin/
-│       ├── dwm-status      # Status bar script
-│       └── hhkb-connect    # HHKB keyboard setup
-├── config/                 # Symlink contents to ~/.config/
-│   ├── picom/              # Compositor (Gruvbox themed)
-│   └── dunst/              # Notifications (Gruvbox themed)
-└── src/                    # Compiled programs
-    └── suckless/
-        ├── dwm/            # Dynamic window manager
-        ├── st/             # Simple terminal
-        └── dmenu/          # Application launcher
+├── arch/        # Arch Linux + dwm setup
+│   ├── config/  # dunst, picom (Gruvbox themed)
+│   ├── home/    # .bashrc, .xinitrc, .gitconfig, etc.
+│   ├── src/     # suckless builds (dwm, st, dmenu)
+│   └── install.sh
+└── fedora/      # Fedora Workstation + GNOME setup
+    ├── config/  # systemd user services
+    ├── home/    # .bashrc, .gitconfig
+    └── install.sh
 ```
 
-## Installation
+## Usage
 
+### Fedora
 ```bash
-# Clone the repo
-git clone https://github.com/dustinJ15/dotfiles.git
-cd dotfiles
-
-# Install suckless tools
-cd src/suckless/dwm && sudo make clean install && cd ../../..
-cd src/suckless/st && sudo make clean install && cd ../../..
-cd src/suckless/dmenu && sudo make clean install && cd ../../..
-
-# Symlink home dotfiles
-ln -sf $(pwd)/home/.bashrc ~/
-ln -sf $(pwd)/home/.bash_profile ~/
-ln -sf $(pwd)/home/.gitconfig ~/
-ln -sf $(pwd)/home/.fehbg ~/
-ln -sf $(pwd)/home/.xinitrc ~/
-mkdir -p ~/.local/bin
-ln -sf $(pwd)/home/.local/bin/* ~/.local/bin/
-
-# Symlink configs
-mkdir -p ~/.config
-ln -sf $(pwd)/config/picom ~/.config/
-ln -sf $(pwd)/config/dunst ~/.config/
+git clone git@github.com:dustinJ15/dotfiles.git ~/dotfiles
+cd ~/dotfiles/fedora
+chmod +x install.sh
+./install.sh
 ```
 
-## Dependencies
+### Arch
+```bash
+git clone git@github.com:dustinJ15/dotfiles.git ~/dotfiles
+cd ~/dotfiles/arch
+chmod +x install.sh
+./install.sh
+```
+
+## Arch Dependencies
 
 - JetBrainsMono Nerd Font
 - picom (compositor)
