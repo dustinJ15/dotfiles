@@ -106,4 +106,34 @@ elif [ "$OS" == "arch" ]; then
     stow_package arch "$HOME" "Arch shell config"
 fi
 
+# --- GNOME keybindings ---
+setup_gnome_keybindings() {
+    if ! command -v gsettings &>/dev/null; then
+        echo -e "${YELLOW}gsettings not found, skipping GNOME keybindings${NC}"
+        return
+    fi
+
+    echo -e "\n${BLUE}Setting GNOME custom keybindings...${NC}"
+
+    local base="org.gnome.settings-daemon.plugins.media-keys"
+    local path="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings"
+
+    gsettings set $base custom-keybindings \
+        "['$path/custom0/', '$path/custom1/']"
+
+    # Super+Enter → foot (opens in last used directory)
+    gsettings set $base.custom-keybinding:$path/custom0/ name    'foot'
+    gsettings set $base.custom-keybinding:$path/custom0/ command 'bash -c "foot --working-directory=\"\$(cat \$HOME/.local/share/foot/cwd 2>/dev/null || echo \$HOME)\""'
+    gsettings set $base.custom-keybinding:$path/custom0/ binding '<Super>Return'
+
+    # Super+b → Firefox new window
+    gsettings set $base.custom-keybinding:$path/custom1/ name    'New Firefox Tab'
+    gsettings set $base.custom-keybinding:$path/custom1/ command 'firefox --new-window'
+    gsettings set $base.custom-keybinding:$path/custom1/ binding '<Super>b'
+
+    echo -e "  ${GREEN}GNOME keybindings set${NC}"
+}
+
+setup_gnome_keybindings
+
 echo -e "\n${BLUE}Done. Open a new shell to see changes.${NC}"
