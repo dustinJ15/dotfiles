@@ -10,13 +10,22 @@ DOTFILES="$HOME/dotfiles"
 
 echo -e "${BLUE}Starting dotfiles installer${NC}"
 
-# --- Detect OS ---
+# --- Detect OS and environment ---
 if [ -f /etc/fedora-release ]; then
     OS="fedora"
 elif [ -f /etc/arch-release ]; then
     OS="arch"
+elif [ -f /etc/debian_version ]; then
+    OS="debian"
 else
     OS="unknown"
+fi
+
+# Headless if no display server
+if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then
+    HEADLESS=true
+else
+    HEADLESS=false
 fi
 
 echo -e "Detected OS: ${YELLOW}$OS${NC}"
@@ -28,6 +37,8 @@ install_packages() {
         sudo dnf install -y stow fzf zsh git curl foot
     elif [ "$OS" == "arch" ]; then
         sudo pacman -S --noconfirm stow fzf zsh git curl foot
+    elif [ "$OS" == "debian" ]; then
+        sudo apt-get install -y stow fzf zsh git curl tmux neovim
     else
         echo -e "${YELLOW}Unknown OS — install stow, fzf, zsh, git, curl manually${NC}"
     fi
@@ -98,7 +109,10 @@ echo -e "\n${BLUE}Linking configs...${NC}"
 stow_package nvim "$HOME/.config" "Neovim (LazyVim)"
 stow_package tmux "$HOME" "tmux"
 stow_package zsh "$HOME" "zsh"
-stow_package foot "$HOME" "foot terminal"
+
+if [ "$HEADLESS" = false ]; then
+    stow_package foot "$HOME" "foot terminal"
+fi
 
 if [ "$OS" == "fedora" ]; then
     stow_package fedora "$HOME" "Fedora shell config"
@@ -134,6 +148,8 @@ setup_gnome_keybindings() {
     echo -e "  ${GREEN}GNOME keybindings set${NC}"
 }
 
-setup_gnome_keybindings
+if [ "$HEADLESS" = false ]; then
+    setup_gnome_keybindings
+fi
 
 echo -e "\n${BLUE}Done. Open a new shell to see changes.${NC}"
