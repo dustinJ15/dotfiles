@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# --- Colors for pretty output ---
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-echo -e "${BLUE}🚀 Starting Modular Dotfiles Installer${NC}"
+DOTFILES="$HOME/dotfiles"
 
-# Detect OS
+echo -e "${BLUE}Starting dotfiles installer${NC}"
+
 if [ -f /etc/fedora-release ]; then
     OS="fedora"
 elif [ -f /etc/arch-release ]; then
@@ -19,38 +19,31 @@ fi
 
 echo -e "Detected OS: ${YELLOW}$OS${NC}"
 
-# Function to handle symlinking
-link_config() {
-    local src=$1
-    local dest=$2
-    local name=$3
+stow_package() {
+    local package=$1
+    local target=${2:-$HOME}
+    local name=${3:-$package}
 
-    read -p "Do you want to install $name config? (y/n) " -n 1 -r
+    read -p "Install $name config? (y/n) " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        mkdir -p "$(dirname "$dest")"
-        if [ -L "$dest" ]; then
-            echo -e "  🔗 ${GREEN}Link already exists for $name${NC}"
-        elif [ -e "$dest" ]; then
-            echo -e "  📦 ${YELLOW}Backing up existing $name config to ${dest}.bak${NC}"
-            mv "$dest" "${dest}.bak"
-            ln -s "$src" "$dest"
-        else
-            echo -e "  ✨ ${GREEN}Linking $name config${NC}"
-            ln -s "$src" "$dest"
-        fi
+        mkdir -p "$target"
+        stow --dir="$DOTFILES" --target="$target" "$package" \
+            && echo -e "  ${GREEN}Linked $name${NC}" \
+            || echo -e "  ${YELLOW}Stow conflict for $name — resolve manually${NC}"
     fi
 }
 
-# --- Core Modules ---
-link_config "$HOME/dotfiles/nvim" "$HOME/.config/nvim" "Neovim (LazyVim)"
-link_config "$HOME/dotfiles/tmux/tmux.conf" "$HOME/.tmux.conf" "tmux"
+# Core
+stow_package nvim "$HOME/.config" "Neovim (LazyVim)"
+stow_package tmux "$HOME" "tmux"
+stow_package zsh "$HOME" "zsh"
 
-# --- OS Specific Modules ---
+# OS specific
 if [ "$OS" == "fedora" ]; then
-    link_config "$HOME/dotfiles/fedora/home/.bashrc" "$HOME/.bashrc" "Fedora Bashrc"
+    stow_package fedora "$HOME" "Fedora shell config"
 elif [ "$OS" == "arch" ]; then
-    link_config "$HOME/dotfiles/arch/home/.bashrc" "$HOME/.bashrc" "Arch Bashrc"
+    stow_package arch "$HOME" "Arch shell config"
 fi
 
-echo -e "${BLUE}✅ Installation finished!${NC}"
+echo -e "${BLUE}Done${NC}"
