@@ -25,9 +25,9 @@ echo -e "Detected OS: ${YELLOW}$OS${NC}"
 install_packages() {
     echo -e "\n${BLUE}Installing system packages...${NC}"
     if [ "$OS" == "fedora" ]; then
-        sudo dnf install -y stow fzf zsh git curl
+        sudo dnf install -y stow fzf zsh git curl foot
     elif [ "$OS" == "arch" ]; then
-        sudo pacman -S --noconfirm stow fzf zsh git curl
+        sudo pacman -S --noconfirm stow fzf zsh git curl foot
     else
         echo -e "${YELLOW}Unknown OS — install stow, fzf, zsh, git, curl manually${NC}"
     fi
@@ -98,6 +98,7 @@ echo -e "\n${BLUE}Linking configs...${NC}"
 stow_package nvim "$HOME/.config" "Neovim (LazyVim)"
 stow_package tmux "$HOME" "tmux"
 stow_package zsh "$HOME" "zsh"
+stow_package foot "$HOME" "foot terminal"
 
 if [ "$OS" == "fedora" ]; then
     stow_package fedora "$HOME" "Fedora shell config"
