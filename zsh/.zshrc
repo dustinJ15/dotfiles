@@ -110,9 +110,11 @@ export NVM_DIR="$HOME/.nvm"
 
 alias claw="ssh -t debian 'sudo -u claw node /home/claw/OpenClaw/dist/index.js tui'"
 
-# Emit OSC 7 so foot knows the cwd (enables new windows to open in same dir)
+# Track cwd for foot and new window spawning
 function osc7_cwd() {
     printf '\e]7;file://%s%s\a' "$HOST" "${PWD// /%20}"
+    mkdir -p "$HOME/.local/share/foot"
+    echo "$PWD" > "$HOME/.local/share/foot/cwd"
 }
 autoload -Uz add-zsh-hook
 add-zsh-hook chpwd osc7_cwd
