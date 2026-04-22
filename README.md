@@ -1,69 +1,75 @@
 # dotfiles
 
-Personal dotfiles for Arch Linux and Fedora Workstation.
+Personal dotfiles for Fedora and Arch Linux. Managed with [GNU Stow](https://www.gnu.org/software/stow/).
+
+## Bootstrap (new machine)
+
+```bash
+git clone git@github.com:dustinJ15/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+chmod +x install.sh
+./install.sh
+```
+
+The installer will:
+1. Install system packages (`stow`, `fzf`, `zsh`, `git`, `curl`)
+2. Install Oh My Zsh
+3. Install zsh plugins (`zsh-autosuggestions`, `zsh-syntax-highlighting`)
+4. Install Starship prompt
+5. Prompt you to stow each config package
 
 ## Structure
 
 ```
 dotfiles/
-├── arch/        # Arch Linux + dwm setup
-│   ├── config/  # dunst, picom (Gruvbox themed)
-│   ├── home/    # .bashrc, .xinitrc, .gitconfig, etc.
-│   ├── src/     # suckless builds (dwm, st, dmenu)
-│   └── install.sh
-├── fedora/      # Fedora Workstation + GNOME setup
-│   ├── config/  # systemd user services
-│   ├── home/    # .bashrc, .gitconfig
-│   └── install.sh
-├── nvim/        # LazyVim Neovim configuration
-├── tmux.conf    # Pro tmux configuration (Ctrl+a prefix)
-└── install-nvim-tmux.sh # Installer for Neovim/tmux
+├── nvim/              # LazyVim config  → ~/.config/nvim/
+├── tmux/
+│   └── .tmux.conf     # tmux config     → ~/.tmux.conf
+├── zsh/
+│   └── .zshrc         # zsh config      → ~/.zshrc
+├── fedora/            # Fedora-specific shell config
+├── arch/              # Arch Linux + dwm setup
+└── install.sh         # Bootstrap script
 ```
 
-## Usage
+## Key bindings
 
-### Fedora
+### tmux (prefix: `Ctrl+a`)
+
+| Action | Keys |
+|---|---|
+| Split vertical divider | `Ctrl+a \|` |
+| Split horizontal divider | `Ctrl+a -` |
+| Navigate panes | `Ctrl+a h/j/k/l` |
+| New window | `Ctrl+a c` |
+| Next / prev window | `Ctrl+a n` / `p` |
+| Kill pane | `Ctrl+a x` |
+| Detach | `Ctrl+a d` |
+
+### nvim / LazyVim (leader: `Space`)
+
+| Action | Keys |
+|---|---|
+| Split vertical divider | `Space \|` |
+| Split horizontal divider | `Space -` |
+| Navigate windows | `Ctrl+h/j/k/l` |
+| Find file | `Space Space` |
+| Search in files | `Space /` |
+
+### fzf (shell)
+
+| Action | Keys |
+|---|---|
+| Fuzzy search history | `Ctrl+r` |
+| Fuzzy find file | `Ctrl+t` |
+| cd into directory | `Alt+c` |
+
+## Adding a new machine-specific config
+
+Create a new Stow package directory mirroring the home directory structure:
+
 ```bash
-git clone git@github.com:dustinJ15/dotfiles.git ~/dotfiles
-cd ~/dotfiles/fedora
-chmod +x install.sh
-./install.sh
+mkdir -p ~/dotfiles/mypackage
+# place files mirroring ~/  e.g. dotfiles/mypackage/.config/foo/bar.conf
+stow --dir=~/dotfiles --target=~ mypackage
 ```
-
-### Arch
-```bash
-git clone git@github.com:dustinJ15/dotfiles.git ~/dotfiles
-cd ~/dotfiles/arch
-chmod +x install.sh
-./install.sh
-```
-
-### Neovim & tmux (Cross-platform)
-```bash
-cd ~/dotfiles
-chmod +x install-nvim-tmux.sh
-./install-nvim-tmux.sh
-```
-
-## Arch Dependencies
-
-- JetBrainsMono Nerd Font
-- picom (compositor)
-- dunst (notifications)
-- feh (wallpaper)
-- maim, xclip (screenshots)
-- pactl (volume)
-- playerctl (media)
-
-## Neovim & tmux Setup
-
-### 🛠️ Included Tools
-- **Neovim:** Powered by [LazyVim](https://www.lazyvim.org/)
-- **tmux:** Optimized for productivity with `Ctrl+a` prefix and mouse support
-- **Font:** JetBrainsMono Nerd Font (Required to see icons properly)
-
-### ⌨️ Quick Shortcuts
-- **tmux Prefix:** `Ctrl+a`
-- **tmux Vertical Split:** `Prefix + |`
-- **tmux Horizontal Split:** `Prefix + -`
-- **LazyVim Leader:** `Space`
