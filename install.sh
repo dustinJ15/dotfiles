@@ -34,7 +34,7 @@ echo -e "Detected OS: ${YELLOW}$OS${NC}"
 install_packages() {
     echo -e "\n${BLUE}Installing system packages...${NC}"
     if [ "$OS" == "fedora" ]; then
-        sudo dnf install -y stow fzf zsh git curl foot
+        sudo dnf install -y stow fzf zsh git curl foot ax86-terminus-ttf-fonts
     elif [ "$OS" == "arch" ]; then
         sudo pacman -S --noconfirm stow fzf zsh git curl foot
     elif [ "$OS" == "debian" ]; then
@@ -112,6 +112,7 @@ stow_package zsh "$HOME" "zsh"
 
 if [ "$HEADLESS" = false ]; then
     stow_package foot "$HOME" "foot terminal"
+    stow_package fontconfig "$HOME" "fontconfig (Terminus bitmap rendering)"
 fi
 
 if [ "$OS" == "fedora" ]; then
