@@ -115,6 +115,83 @@ export NVM_DIR="$HOME/.nvm"
 
 alias claw="ssh -t debian 'sudo -u claw node /home/claw/OpenClaw/dist/index.js tui'"
 
+# AI toolchain
+export PATH="$HOME/.npm-global/bin:$HOME/.opencode/bin:$PATH"
+export OLLAMA_HOST=http://localhost:11434
+export OLLAMA_API_BASE=http://localhost:11434
+[[ -d /usr/local/cuda ]] && {
+    export PATH=/usr/local/cuda/bin:$PATH
+    export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
+}
+
+# chat <shortcode> to chat with an ollama model, or just `chat` for a picker
+function chat() {
+  local -A models=(
+    [q3]="qwen3:32b-q4_K_M"
+    [q3c]="qwen3-coder:30b-a3b-q4_K_M"
+    [q25c]="qwen2.5-coder:14b-instruct-q4_K_M"
+    [g4]="gemma4:31b-it-q4_K_M"
+    [g4m]="gemma4:26b-a4b-it-q4_K_M"
+    [e4b]="gemma4:e4b-it-q4_K_M"
+  )
+  local labels=(
+    "q3   — qwen3 32B"
+    "q3c  — qwen3-coder 30B A3B"
+    "q25c — qwen2.5-coder 14B"
+    "g4   — gemma4 31B"
+    "g4m  — gemma4 26B A4B"
+    "e4b  — gemma4 E4B"
+  )
+  local keys=(q3 q3c q25c g4 g4m e4b)
+
+  if [[ -n "${models[$1]}" ]]; then
+    ollama run "${models[$1]}"
+  else
+    echo "Pick a model:"
+    for i in {1..${#labels[@]}}; do
+      echo "  $i) ${labels[$i]}"
+    done
+    echo -n "? "
+    read choice
+    local key="${keys[$choice]}"
+    [[ -n "$key" ]] && ollama run "${models[$key]}"
+  fi
+}
+
+# ai <shortcode> to launch aider with a model, or just `ai` for a picker
+function ai() {
+  local -A models=(
+    [q3c]="ollama/qwen3-coder:30b-a3b-q4_K_M"
+    [q25c]="ollama/qwen2.5-coder:14b-instruct-q4_K_M"
+    [q3]="ollama/qwen3:32b-q4_K_M"
+    [g4]="ollama/gemma4:31b-it-q4_K_M"
+    [g4m]="ollama/gemma4:26b-a4b-it-q4_K_M"
+    [e4b]="ollama/gemma4:e4b-it-q4_K_M"
+  )
+  local labels=(
+    "q3   — qwen3 32B"
+    "q3c  — qwen3-coder 30B A3B"
+    "q25c — qwen2.5-coder 14B"
+    "g4   — gemma4 31B"
+    "g4m  — gemma4 26B A4B"
+    "e4b  — gemma4 E4B"
+  )
+  local keys=(q3 q3c q25c g4 g4m e4b)
+
+  if [[ -n "${models[$1]}" ]]; then
+    aider --model "${models[$1]}" "${@:2}"
+  else
+    echo "Pick a model:"
+    for i in {1..${#labels[@]}}; do
+      echo "  $i) ${labels[$i]}"
+    done
+    echo -n "? "
+    read choice
+    local key="${keys[$choice]}"
+    [[ -n "$key" ]] && aider --model "${models[$key]}"
+  fi
+}
+
 # Track cwd for foot and new window spawning
 function osc7_cwd() {
     printf '\e]7;file://%s%s\a' "$HOST" "${PWD// /%20}"

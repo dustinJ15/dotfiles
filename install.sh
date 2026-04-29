@@ -106,7 +106,7 @@ install_zsh_plugins
 install_starship
 
 echo -e "\n${BLUE}Linking configs...${NC}"
-stow_package nvim "$HOME/.config" "Neovim (LazyVim)"
+stow_package nvim "$HOME/.config/nvim" "Neovim (LazyVim)"
 stow_package tmux "$HOME" "tmux"
 stow_package zsh "$HOME" "zsh"
 
@@ -116,7 +116,14 @@ if [ "$HEADLESS" = false ]; then
 fi
 
 if [ "$OS" == "fedora" ]; then
-    stow_package fedora "$HOME" "Fedora shell config"
+    echo -e "\n${BLUE}Linking Fedora configs...${NC}"
+    ln -sf "$DOTFILES/fedora/home/.gitconfig"        "$HOME/.gitconfig"
+    ln -sf "$DOTFILES/fedora/home/.gitignore_global" "$HOME/.gitignore_global"
+    ln -sf "$DOTFILES/fedora/home/.bashrc"           "$HOME/.bashrc"
+    mkdir -p "$HOME/.config/systemd/user"
+    ln -sf "$DOTFILES/fedora/config/systemd/user/rclone-gdrive.service" \
+           "$HOME/.config/systemd/user/rclone-gdrive.service"
+    echo -e "  ${GREEN}Fedora configs linked${NC}"
 elif [ "$OS" == "arch" ]; then
     stow_package arch "$HOME" "Arch shell config"
 fi

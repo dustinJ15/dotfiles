@@ -15,6 +15,8 @@ export PATH
 # export SYSTEMD_PAGER=
 
 # User specific aliases and functions
+alias update='sudo dnf upgrade && flatpak update'
+export PATH="$HOME/.npm-global/bin:$PATH"
 if [ -d ~/.bashrc.d ]; then
     for rc in ~/.bashrc.d/*; do
         if [ -f "$rc" ]; then
